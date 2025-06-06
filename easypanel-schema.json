@@ -64,7 +64,7 @@
           "type": "dockerfile",
           "file": "Dockerfile"
         },
-        "env": "# CONFIGURAÇÃO CORRIGIDA PARA EASYPANEL\n\n# Protocolo do backend (sempre HTTPS em produção)\nBACKEND_PROTOCOL=https\n\n# Host do backend (SEM porta para HTTPS)\nBACKEND_HOST=apicrm.luckdistribuidora.com.br\n\n# NÃO usar BACKEND_PORT para HTTPS (usa 443 por padrão)\n# Se precisar forçar, descomente a linha abaixo:\n# BACKEND_PORT=443\n\n# Para resolução DNS interna entre containers\nBACKEND_SERVICE=luck_backcrmluck\n\n# Configurações de log\nLOG_LEVEL=debug\n\n# Token de ambiente (mesmo do backend)\nENV_TOKEN=luck\n\n# Configurações React (se necessário)\n# REACT_APP_BACKEND_URL=https://apicrm.luckdistribuidora.com.br",
+        "env": "# CONFIGURAÇÃO CORRIGIDA PARA EASYPANEL\n\n# Protocolo do backend (sempre HTTPS em produção)\nBACKEND_PROTOCOL=https\n\n# Host do backend (SEM porta para HTTPS)\nBACKEND_HOST=apicrm.luckdistribuidora.com.br\n\n# Caminho para proxy (sempre usar /backend)\nBACKEND_PATH=/backend\n\n# Para resolução DNS interna entre containers\nBACKEND_SERVICE=luck_backcrmluck\n\n# Configurações de log\nLOG_LEVEL=debug\n\n# Token de ambiente (OBRIGATÓRIO - mesmo do backend)\nENV_TOKEN=luck\n\n# Configurações React (se necessário)\n# REACT_APP_BACKEND_URL=https://apicrm.luckdistribuidora.com.br",
         "deploy": {
           "replicas": 1,
           "command": null,

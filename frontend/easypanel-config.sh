@@ -5,45 +5,16 @@
 
 # Função para gerar config.json otimizado
 generate_config() {
-    echo "{"
-    
-    # Configurações essenciais do backend
-    if [ -n "$BACKEND_PROTOCOL" ]; then
-        echo "  \"BACKEND_PROTOCOL\": \"$BACKEND_PROTOCOL\","
-    else
-        echo "  \"BACKEND_PROTOCOL\": \"https\","
-    fi
-    
-    if [ -n "$BACKEND_HOST" ]; then
-        echo "  \"BACKEND_HOST\": \"$BACKEND_HOST\","
-    fi
-    
-    if [ -n "$BACKEND_PORT" ]; then
-        echo "  \"BACKEND_PORT\": \"$BACKEND_PORT\","
-    fi
-    
-    if [ -n "$BACKEND_PATH" ]; then
-        echo "  \"BACKEND_PATH\": \"$BACKEND_PATH\","
-    fi
-    
-    if [ -n "$LOG_LEVEL" ]; then
-        echo "  \"LOG_LEVEL\": \"$LOG_LEVEL\","
-    fi
-    
-    if [ -n "$ENV_TOKEN" ]; then
-        echo "  \"ENV_TOKEN\": \"$ENV_TOKEN\","
-    fi
-    
-    # Configurações do React (se existirem)
-    while IFS='=' read -r name value; do
-        if [[ "$name" == REACT_APP_* ]]; then
-            echo "  \"$name\": \"$value\","
-        fi
-    done < <(env)
-    
-    # Remover a última vírgula e fechar JSON
-    echo "  \"ENVIRONMENT\": \"easypanel\""
-    echo "}"
+    cat << EOF
+{
+  "BACKEND_PROTOCOL": "${BACKEND_PROTOCOL:-https}",
+  "BACKEND_HOST": "${BACKEND_HOST:-localhost}",
+  "BACKEND_PATH": "${BACKEND_PATH:-/backend}",
+  "LOG_LEVEL": "${LOG_LEVEL:-info}",
+  "ENV_TOKEN": "${ENV_TOKEN:-}",
+  "ENVIRONMENT": "easypanel"
+}
+EOF
 }
 
 # Configurar DNS interno se BACKEND_SERVICE estiver definido
@@ -64,6 +35,13 @@ generate_config > /var/www/public/config.json
 
 echo "Configuração gerada:"
 cat /var/www/public/config.json
+
+# Criar arquivo de configuração global para o ENV_TOKEN
+echo "Configurando ENV_TOKEN global..."
+cat << EOF > /var/www/public/env-config.js
+window.__APP_ENV_TOKEN__ = "${ENV_TOKEN:-}";
+console.log("ENV_TOKEN configurado:", window.__APP_ENV_TOKEN__ ? "OK" : "VAZIO");
+EOF
 
 echo "Iniciando nginx..."
 exec nginx -g "daemon off;" 

@@ -117,6 +117,9 @@
 			// See https://github.com/facebook/react/issues/20829#issuecomment-802088260
 			if (!crossOriginIsolated) SharedArrayBuffer = ArrayBuffer;
 		</script>
+
+		<!-- Carregar configuração de ambiente -->
+		<script src="/env-config.js"></script>
 	</head>
 	<body>
 	  <div id="splash-background">
@@ -159,8 +162,9 @@
 
 		const backendUrl = window.location.hostname === "localhost" ? "http://localhost:8080" : "/backend";
 		const settingsBaseUrl = backendUrl + "/public-settings";
+		const envToken = window.__APP_ENV_TOKEN__ || "luck";
 		
-		fetch(settingsBaseUrl + "/primaryColor" + (theme === "dark" ? "Dark" : "Light"))
+		fetch(settingsBaseUrl + "/primaryColor" + (theme === "dark" ? "Dark" : "Light") + "?token=" + envToken)
 		    .then(response => response.json())
         .then(data => {
           const root = document.documentElement;
@@ -174,8 +178,8 @@
         });
 		
 		Promise.all([
-				fetch(settingsBaseUrl + "/appLogoDark"),
-				fetch(settingsBaseUrl + "/appLogoLight")
+				fetch(settingsBaseUrl + "/appLogoDark?token=" + envToken),
+				fetch(settingsBaseUrl + "/appLogoLight?token=" + envToken)
 				]).then(async responses => {
 					const appLogo = document.getElementById('app-logo');
 					
@@ -192,7 +196,7 @@
 					appLogoDiv.style.display = "block";
 				});
 		
-		fetch(settingsBaseUrl + "/appName")
+		fetch(settingsBaseUrl + "/appName?token=" + envToken)
         .then(response => response.json())
         .then(data => {
           document.title = data || "ticketz";

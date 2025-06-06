@@ -10,6 +10,8 @@ As seguintes correções foram implementadas para garantir funcionamento no Easy
 2. **Proxy nginx otimizado** - Headers corretos para SSL/TLS
 3. **Script de configuração específico** - Geração otimizada do config.json
 4. **DNS interno** - Resolução automática entre containers
+5. **ENV_TOKEN automático** - Token injetado globalmente para public-settings
+6. **Index.html otimizado** - Splash screen com autenticação correta
 
 ## Schema Corrigido
 
@@ -27,13 +29,16 @@ BACKEND_PROTOCOL=https
 # Host do backend (SEM porta para HTTPS) 
 BACKEND_HOST=apicrm.luckdistribuidora.com.br
 
+# Caminho para proxy (sempre usar /backend)
+BACKEND_PATH=/backend
+
 # Para resolução DNS interna entre containers
 BACKEND_SERVICE=luck_backcrmluck
 
 # Configurações de log
 LOG_LEVEL=debug
 
-# Token de ambiente (mesmo do backend)
+# Token de ambiente (OBRIGATÓRIO - mesmo do backend)
 ENV_TOKEN=luck
 ```
 
@@ -105,8 +110,10 @@ Os seguintes arquivos foram corrigidos:
 1. `frontend/nginx/sites.d/frontend.conf` - Headers de proxy
 2. `frontend/Dockerfile` - Uso do script otimizado  
 3. `frontend/easypanel-config.sh` - Script de configuração
-4. `backend/src/app.ts` - CORS flexível
-5. `backend/src/libs/socket.ts` - Socket.io CORS
+4. `frontend/public/index.html` - Splash screen com ENV_TOKEN
+5. `frontend/src/services/api.js` - Interceptor para ENV_TOKEN
+6. `backend/src/app.ts` - CORS flexível
+7. `backend/src/libs/socket.ts` - Socket.io CORS
 
 ## Troubleshooting
 
