@@ -9,6 +9,7 @@ fi
 
 # Check the input file exists
 if [ ! -f "$INPUT_DIR/$ARCHIVE_NAME" ]; then
+    echo "No retrieved file found - skipping (normal for local development)"
     exit 0
 fi
 

@@ -477,11 +477,14 @@ const Dashboard = () => {
             user={currentUser}
             yes={() => (
               <Grid item xs={12}>
+                {/* Comentado: Modal de registro do Ticketz
                 {!registered &&
                   <Paper className={classes.ticketzRegistryPaper}>
                     <TicketzRegistry onRegister={setRegistered} />
                   </Paper>
                 }
+                */}
+                {/* Comentado: Seção Ticketz PRO
                 <Paper className={clsx(classes.ticketzProPaper, {
                   [classes.clickpointer]: !proInstructionsOpen,
                 })} onClick={() => showProInstructions()}>
@@ -550,10 +553,12 @@ const Dashboard = () => {
                     }
                   </Grid>
                 </Paper>
+                */}
               </Grid>
             )} />
 
 
+          {/* Comentado: Seção de suporte/doação do Ticketz
           <OnlyForSuperUser
             user={currentUser}
             yes={() => (
@@ -604,6 +609,7 @@ const Dashboard = () => {
                 </Paper>
               </Grid>
             )} />
+          */}
 
           {/* DASHBOARD ATENDIMENTOS HOJE */}
           

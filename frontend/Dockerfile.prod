@@ -1,0 +1,61 @@
+FROM node:20-alpine as build-deps
+
+WORKDIR /usr/src/app
+COPY . .
+
+ENV NODE_OPTIONS --openssl-legacy-provider
+
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci && npm run build
+
+FROM nginx:alpine
+
+WORKDIR /usr/share/nginx/html
+
+COPY --from=build-deps /usr/src/app/build /var/www/public
+COPY --from=build-deps /usr/src/app/node_modules/@socket.io/admin-ui/ui/dist /var/www/public/socket-admin
+COPY nginx /etc/nginx
+
+# Usar configuração específica para produção
+COPY nginx/sites.d/frontend.prod.conf /etc/nginx/sites.d/frontend.conf
+
+# Script para gerar configurações dinamicamente
+RUN echo '#!/bin/bash\n\
+echo "=== Iniciando configuração do Frontend ==="\n\
+echo "BACKEND_HOST: ${BACKEND_HOST}"\n\
+echo "BACKEND_PATH: ${BACKEND_PATH}"\n\
+echo "BACKEND_PROTOCOL: ${BACKEND_PROTOCOL}"\n\
+echo "ENV_TOKEN: ${ENV_TOKEN}"\n\
+\n\
+# Gerar config.json dinâmico\n\
+cat << EOF > /var/www/public/config.json\n\
+{\n\
+  "BACKEND_PROTOCOL": "${BACKEND_PROTOCOL:-https}",\n\
+  "BACKEND_HOST": "${BACKEND_HOST:-localhost}",\n\
+  "BACKEND_PORT": "",\n\
+  "BACKEND_PATH": "${BACKEND_PATH:-/backend}",\n\
+  "LOG_LEVEL": "${LOG_LEVEL:-info}",\n\
+  "ENV_TOKEN": "${ENV_TOKEN:-ticketz}",\n\
+  "ENVIRONMENT": "production"\n\
+}\n\
+EOF\n\
+\n\
+# Gerar env-config.js dinâmico\n\
+cat << EOF > /var/www/public/env-config.js\n\
+window.__APP_ENV_TOKEN__ = "${ENV_TOKEN:-ticketz}";\n\
+console.log("ENV_TOKEN configurado (produção):", window.__APP_ENV_TOKEN__);\n\
+EOF\n\
+\n\
+echo "=== Configuração gerada ==="\n\
+cat /var/www/public/config.json\n\
+echo "========================="\n\
+\n\
+echo "Iniciando nginx..."\n\
+exec nginx -g "daemon off;"\n\
+' > /usr/local/bin/start-frontend.sh
+
+RUN chmod +x /usr/local/bin/start-frontend.sh
+
+EXPOSE 80
+
+CMD ["/usr/local/bin/start-frontend.sh"] 
