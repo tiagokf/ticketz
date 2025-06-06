@@ -13,9 +13,32 @@ As seguintes correções foram implementadas para garantir funcionamento no Easy
 5. **ENV_TOKEN automático** - Token injetado globalmente para public-settings
 6. **Index.html otimizado** - Splash screen com autenticação correta
 
-## Schema Corrigido
+## ⚠️ SEGURANÇA PRIMEIRO
 
-Use o arquivo `easypanel-schema.json` que contém as configurações corrigidas.
+**IMPORTANTE:** O arquivo `easypanel-schema.json` foi removido por conter dados sensíveis.
+
+### Configure Seguramente:
+
+1. **Copie o template:**
+```bash
+cp easypanel-schema-template.json easypanel-schema.json
+```
+
+2. **Gere secrets seguros:** (consulte `SECURITY.md`)
+```bash
+# JWT Secrets
+node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+
+# Senhas
+openssl rand -base64 32
+```
+
+3. **Substitua TODOS os placeholders** no arquivo copiado
+4. **NUNCA commite** o arquivo com dados reais
+
+## Schema Template
+
+Use o arquivo `easypanel-schema-template.json` como base.
 
 ### Principais Correções no Schema:
 
@@ -62,9 +85,13 @@ git push origin main
 
 ### 2. Configurar no Easypanel
 
-1. **Importe o schema corrigido** (`easypanel-schema.json`)
-2. **Aguarde o build** dos containers
-3. **Verifique os logs** de cada serviço
+1. **Configure o schema seguro:**
+   - Copie `easypanel-schema-template.json` para `easypanel-schema.json`
+   - Substitua TODOS os placeholders por valores reais
+   - Gere secrets seguros conforme `SECURITY.md`
+2. **Importe o schema configurado** (`easypanel-schema.json`)
+3. **Aguarde o build** dos containers
+4. **Verifique os logs** de cada serviço
 
 ### 3. Verificar Funcionamento
 
