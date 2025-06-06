@@ -27,7 +27,24 @@ app.set("queues", {
 app.use(
   cors({
     credentials: true,
-    origin: process.env.FRONTEND_URL
+    origin: function (origin, callback) {
+      // Permitir requisições sem origin (mobile apps, etc)
+      if (!origin) return callback(null, true);
+      
+      // Lista de origens permitidas
+      const allowedOrigins = [
+        process.env.FRONTEND_URL,
+        process.env.CORS_ORIGIN,
+        process.env.BACKEND_URL
+      ].filter(Boolean);
+      
+      // Verificar se a origin está na lista ou se é localhost para desenvolvimento
+      if (allowedOrigins.includes(origin) || origin.includes('localhost')) {
+        return callback(null, true);
+      }
+      
+      return callback(new Error('Not allowed by CORS'), false);
+    }
   })
 );
 app.use(cookieParser());

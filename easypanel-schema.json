@@ -1,0 +1,116 @@
+{
+  "services": [
+    {
+      "type": "app",
+      "data": {
+        "projectName": "luck",
+        "serviceName": "backcrmluck",
+        "source": {
+          "type": "github",
+          "owner": "tiagokf",
+          "repo": "ticketz",
+          "ref": "main",
+          "path": "/backend",
+          "autoDeploy": false
+        },
+        "build": {
+          "type": "dockerfile",
+          "file": "Dockerfile"
+        },
+        "env": "# Banco de Dados Postgres\nDB_HOST=luck_postgresluck\nDB_PORT=5432\nDB_NAME=postgresluck\nDB_USER=postgresluck\nDB_PASS=Postgresluck2020\nDB_DIALECT=postgres\nDB_TIMEZONE=America/Sao_Paulo\n\n# Redis\nREDIS_URI=redis://default:Redisluck2020@luck_redisluck:6379\n\n# Configuração do Backend\nPORT=3000\nNODE_ENV=production\n\n# URLs e CORS - CONFIGURAÇÃO CORRIGIDA\nFRONTEND_URL=https://crm.luckdistribuidora.com.br\nBACKEND_URL=https://apicrm.luckdistribuidora.com.br\nCORS_ORIGIN=https://crm.luckdistribuidora.com.br\n\n# Segurança\nENV_TOKEN=luck\nJWT_SECRET=d29a7b84c3e5f6921d8ac04e73b59f0812a6e74958df31c02b7694a85e0c3fd1\nJWT_REFRESH_SECRET=a6b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7\nPROXY=true\n\n# Email\nEMAIL_ADDRESS=tiago@tiremoto.com.br\n\n# Integração Ticketz OSS (opcional)\nTICKETZ_REGISTRY_URL=\n\n# Recaptcha (opcional, se usar)\nRECAPTCHA_SECRET_KEY=",
+        "deploy": {
+          "replicas": 1,
+          "command": null,
+          "zeroDowntime": true
+        },
+        "domains": [
+          {
+            "host": "luck-backcrmluck.ffbaxg.easypanel.host",
+            "https": true,
+            "port": 3000,
+            "path": "/",
+            "middlewares": [],
+            "certificateResolver": "",
+            "wildcard": false,
+            "internalProtocol": "http"
+          },
+          {
+            "host": "apicrm.luckdistribuidora.com.br",
+            "https": true,
+            "port": 3000,
+            "path": "/",
+            "middlewares": [],
+            "certificateResolver": "",
+            "wildcard": false,
+            "internalProtocol": "http"
+          }
+        ]
+      }
+    },
+    {
+      "type": "app",
+      "data": {
+        "projectName": "luck",
+        "serviceName": "frontcrmluck",
+        "source": {
+          "type": "github",
+          "owner": "tiagokf",
+          "repo": "ticketz",
+          "ref": "main",
+          "path": "/frontend",
+          "autoDeploy": false
+        },
+        "build": {
+          "type": "dockerfile",
+          "file": "Dockerfile"
+        },
+        "env": "# CONFIGURAÇÃO CORRIGIDA PARA EASYPANEL\n\n# Protocolo do backend (sempre HTTPS em produção)\nBACKEND_PROTOCOL=https\n\n# Host do backend (SEM porta para HTTPS)\nBACKEND_HOST=apicrm.luckdistribuidora.com.br\n\n# NÃO usar BACKEND_PORT para HTTPS (usa 443 por padrão)\n# Se precisar forçar, descomente a linha abaixo:\n# BACKEND_PORT=443\n\n# Para resolução DNS interna entre containers\nBACKEND_SERVICE=luck_backcrmluck\n\n# Configurações de log\nLOG_LEVEL=debug\n\n# Token de ambiente (mesmo do backend)\nENV_TOKEN=luck\n\n# Configurações React (se necessário)\n# REACT_APP_BACKEND_URL=https://apicrm.luckdistribuidora.com.br",
+        "deploy": {
+          "replicas": 1,
+          "command": null,
+          "zeroDowntime": true
+        },
+        "domains": [
+          {
+            "host": "luck-frontcrmluck.ffbaxg.easypanel.host",
+            "https": true,
+            "port": 80,
+            "path": "/",
+            "middlewares": [],
+            "certificateResolver": "",
+            "wildcard": false,
+            "internalProtocol": "http"
+          },
+          {
+            "host": "crm.luckdistribuidora.com.br",
+            "https": true,
+            "port": 80,
+            "path": "/",
+            "middlewares": [],
+            "certificateResolver": "",
+            "wildcard": false,
+            "internalProtocol": "http"
+          }
+        ]
+      }
+    },
+    {
+      "type": "postgres",
+      "data": {
+        "projectName": "luck",
+        "serviceName": "postgresluck",
+        "image": "postgres:17",
+        "password": "Postgresluck2020"
+      }
+    },
+    {
+      "type": "redis",
+      "data": {
+        "projectName": "luck",
+        "serviceName": "redisluck",
+        "image": "redis:7",
+        "password": "Redisluck2020"
+      }
+    }
+  ]
+} 

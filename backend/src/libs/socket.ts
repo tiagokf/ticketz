@@ -71,7 +71,25 @@ const joinTicketChannel = async (
 export const initIO = (httpServer: Server): SocketIO => {
   io = new SocketIO(httpServer, {
     cors: {
-      origin: process.env.FRONTEND_URL
+      origin: function (origin, callback) {
+        // Permitir requisições sem origin
+        if (!origin) return callback(null, true);
+        
+        // Lista de origens permitidas
+        const allowedOrigins = [
+          process.env.FRONTEND_URL,
+          process.env.CORS_ORIGIN,
+          process.env.BACKEND_URL
+        ].filter(Boolean);
+        
+        // Verificar se a origin está na lista ou se é localhost
+        if (allowedOrigins.includes(origin) || origin.includes('localhost')) {
+          return callback(null, true);
+        }
+        
+        return callback(new Error('Not allowed by CORS'), false);
+      },
+      credentials: true
     }
   });
 
