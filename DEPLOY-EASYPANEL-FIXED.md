@@ -61,6 +61,11 @@ FRONTEND_URL=https://crm.luckdistribuidora.com.br
 BACKEND_URL=https://crm.luckdistribuidora.com.br/backend
 CORS_ORIGIN=https://crm.luckdistribuidora.com.br
 
+# POSTGRES - IMPORTANTE: No Easypanel o usuário padrão é sempre 'postgres'
+DB_NAME=postgres
+DB_USER=postgres
+DB_PASS=Postgresluck2020
+
 # Usar as configurações do arquivo backend.env
 ```
 
@@ -123,6 +128,17 @@ Database connected successfully
 
 ## 🔧 **Troubleshooting**
 
+### **Se erro de autenticação PostgreSQL:**
+```
+ERROR: password authentication failed for user "postgresluck"
+```
+**Solução:** No Easypanel, o usuário padrão do PostgreSQL é sempre `postgres`, não o nome do serviço:
+```env
+DB_NAME=postgres
+DB_USER=postgres
+DB_PASS=Postgresluck2020
+```
+
 ### **Se ainda houver erros SSL:**
 1. Verificar se `apicrm.luckdistribuidora.com.br` foi **removido** do DNS
 2. Confirmar que frontend usa apenas `crm.luckdistribuidora.com.br/backend`
@@ -130,6 +146,12 @@ Database connected successfully
 ### **Se 403 em public-settings:**
 1. Verificar se `ENV_TOKEN=luck` está configurado no frontend
 2. Confirmar que o script está gerando `env-config.js` corretamente
+
+### **Se erro de script não encontrado:**
+```
+/usr/local/bin/start-frontend.sh: not found
+```
+**Solução:** O Dockerfile agora usa `docker-entrypoint.d` em vez de script customizado. Verificar se o rebuild do frontend foi feito corretamente.
 
 ### **Se nginx não rotear:**
 1. Verificar se `frontend.prod.conf` está sendo copiado

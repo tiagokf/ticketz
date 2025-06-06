@@ -19,43 +19,28 @@ COPY nginx /etc/nginx
 # Usar configuração específica para produção
 COPY nginx/sites.d/frontend.prod.conf /etc/nginx/sites.d/frontend.conf
 
-# Script para gerar configurações dinamicamente
-RUN echo '#!/bin/bash\n\
-echo "=== Iniciando configuração do Frontend ==="\n\
-echo "BACKEND_HOST: ${BACKEND_HOST}"\n\
-echo "BACKEND_PATH: ${BACKEND_PATH}"\n\
-echo "BACKEND_PROTOCOL: ${BACKEND_PROTOCOL}"\n\
-echo "ENV_TOKEN: ${ENV_TOKEN}"\n\
-\n\
-# Gerar config.json dinâmico\n\
-cat << EOF > /var/www/public/config.json\n\
-{\n\
-  "BACKEND_PROTOCOL": "${BACKEND_PROTOCOL:-https}",\n\
-  "BACKEND_HOST": "${BACKEND_HOST:-localhost}",\n\
-  "BACKEND_PORT": "",\n\
-  "BACKEND_PATH": "${BACKEND_PATH:-/backend}",\n\
-  "LOG_LEVEL": "${LOG_LEVEL:-info}",\n\
-  "ENV_TOKEN": "${ENV_TOKEN:-ticketz}",\n\
-  "ENVIRONMENT": "production"\n\
-}\n\
-EOF\n\
-\n\
-# Gerar env-config.js dinâmico\n\
-cat << EOF > /var/www/public/env-config.js\n\
-window.__APP_ENV_TOKEN__ = "${ENV_TOKEN:-ticketz}";\n\
-console.log("ENV_TOKEN configurado (produção):", window.__APP_ENV_TOKEN__);\n\
-EOF\n\
-\n\
-echo "=== Configuração gerada ==="\n\
-cat /var/www/public/config.json\n\
-echo "========================="\n\
-\n\
-echo "Iniciando nginx..."\n\
-exec nginx -g "daemon off;"\n\
-' > /usr/local/bin/start-frontend.sh
+# Criar script inline usando docker-entrypoint.d (executa antes do nginx)
+RUN echo '#!/bin/sh' > /docker-entrypoint.d/99-generate-config.sh && \
+    echo 'echo "=== Configuração Frontend ==="' >> /docker-entrypoint.d/99-generate-config.sh && \
+    echo 'echo "BACKEND_HOST: $BACKEND_HOST"' >> /docker-entrypoint.d/99-generate-config.sh && \
+    echo 'echo "BACKEND_PATH: $BACKEND_PATH"' >> /docker-entrypoint.d/99-generate-config.sh && \
+    echo 'cat > /var/www/public/config.json << EOF' >> /docker-entrypoint.d/99-generate-config.sh && \
+    echo '{' >> /docker-entrypoint.d/99-generate-config.sh && \
+    echo '  "BACKEND_PROTOCOL": "${BACKEND_PROTOCOL:-https}",' >> /docker-entrypoint.d/99-generate-config.sh && \
+    echo '  "BACKEND_HOST": "${BACKEND_HOST:-localhost}",' >> /docker-entrypoint.d/99-generate-config.sh && \
+    echo '  "BACKEND_PORT": "",' >> /docker-entrypoint.d/99-generate-config.sh && \
+    echo '  "BACKEND_PATH": "${BACKEND_PATH:-/backend}",' >> /docker-entrypoint.d/99-generate-config.sh && \
+    echo '  "LOG_LEVEL": "${LOG_LEVEL:-info}",' >> /docker-entrypoint.d/99-generate-config.sh && \
+    echo '  "ENV_TOKEN": "${ENV_TOKEN:-ticketz}",' >> /docker-entrypoint.d/99-generate-config.sh && \
+    echo '  "ENVIRONMENT": "production"' >> /docker-entrypoint.d/99-generate-config.sh && \
+    echo '}' >> /docker-entrypoint.d/99-generate-config.sh && \
+    echo 'EOF' >> /docker-entrypoint.d/99-generate-config.sh && \
+    echo 'cat > /var/www/public/env-config.js << EOF' >> /docker-entrypoint.d/99-generate-config.sh && \
+    echo 'window.__APP_ENV_TOKEN__ = "${ENV_TOKEN:-ticketz}";' >> /docker-entrypoint.d/99-generate-config.sh && \
+    echo 'console.log("ENV_TOKEN configurado:", window.__APP_ENV_TOKEN__);' >> /docker-entrypoint.d/99-generate-config.sh && \
+    echo 'EOF' >> /docker-entrypoint.d/99-generate-config.sh && \
+    echo 'echo "=== Config gerado ==="' >> /docker-entrypoint.d/99-generate-config.sh && \
+    echo 'cat /var/www/public/config.json' >> /docker-entrypoint.d/99-generate-config.sh && \
+    chmod +x /docker-entrypoint.d/99-generate-config.sh
 
-RUN chmod +x /usr/local/bin/start-frontend.sh
-
-EXPOSE 80
-
-CMD ["/usr/local/bin/start-frontend.sh"] 
+EXPOSE 80 
