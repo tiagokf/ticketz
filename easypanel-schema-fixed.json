@@ -23,6 +23,13 @@
           "command": null,
           "zeroDowntime": true
         },
+        "mounts": [
+          {
+            "type": "volume",
+            "name": "backend-uploads",
+            "mountPath": "/usr/src/app/public"
+          }
+        ],
         "domains": [
           {
             "host": "luck-backcrmluck.ffbaxg.easypanel.host",

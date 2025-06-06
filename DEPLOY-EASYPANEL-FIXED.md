@@ -48,7 +48,13 @@ Use o arquivo `easypanel-schema-fixed.json`:
 #### **Frontend:**
 - `Dockerfile.prod` com script de configuração dinâmica
 - Nginx roteando `/backend/*` para `luck_backcrmluck:3000`
+- **Nginx corrigido** para proxy de uploads (`/backend/public/*`)
 - Configuração gerada dinamicamente via ENV vars
+
+#### **Uploads:**
+- Volume persistente `backend-uploads` para arquivos carregados
+- Nginx faz proxy dos uploads em vez de servir arquivos estáticos
+- WhiteLabel (logos) funcionando corretamente
 
 ---
 
@@ -152,6 +158,12 @@ DB_PASS=Postgresluck2020
 /usr/local/bin/start-frontend.sh: not found
 ```
 **Solução:** O Dockerfile agora usa `docker-entrypoint.d` em vez de script customizado. Verificar se o rebuild do frontend foi feito corretamente.
+
+### **Se 404 em uploads de imagens:**
+```
+GET /backend/public/1749231676885.png 404 (Not Found)
+```
+**Solução:** Nginx corrigido para usar proxy em vez de alias. Volume persistente adicionado ao backend.
 
 ### **Se nginx não rotear:**
 1. Verificar se `frontend.prod.conf` está sendo copiado
